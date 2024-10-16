@@ -30,14 +30,7 @@ class Knx {
   public:
     bool start(const char * multiCastAddress, uint16_t multiCastPort);
     bool onChange(const char * device, const char * tag, const char * name, const char * value);
-    // ip stuff
-    uint32_t currentIpAddress();
-    uint32_t currentSubnetMask();
-    uint32_t currentDefaultGateway();
-    void     macAddress(uint8_t * addr);
 
-    // unique serial number
-    uint32_t uniqueSerialNumber();
 
     // basic stuff
     void restart();
@@ -51,9 +44,11 @@ class Knx {
     //unicast
     bool sendBytesUniCast(uint32_t addr, uint16_t port, uint8_t * buffer, uint16_t len);
 
+/*
     //memory
     uint8_t * getEepromBuffer(uint32_t size);
     void      commitToEeprom();
+*/
 
   private:
     WiFiUDP * _udp = nullptr;
@@ -73,4 +68,4 @@ class Knx {
 
 } // namespace emsesp
 
-#endif //EMSESP_MODBUS_H_
+#endif //EMSESP_KNX_H_

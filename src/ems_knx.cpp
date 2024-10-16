@@ -22,7 +22,7 @@
 #include <knx.h>
 #include <ems_knx_platform.h>
 
-EMSEsp32Platform knxPlatform(&Serial2);
+EMSEsp32Platform knxPlatform();
 Bau57B0 knxBau(knxPlatform);
 KnxFacade<EMSEsp32Platform, Bau57B0> knx(knxBau);
 
@@ -65,7 +65,6 @@ void Knx::knx_loop_task(void * pvParameters) {
 void Knx::loop() {
     // do loop
     knx.loop();
-    
 }
 
 /*
@@ -123,32 +122,6 @@ bool Knx::setValue(const char * device, const char * tag, const char * name, con
     return true;
 }
 
-uint32_t Knx::currentIpAddress() {
-    return WiFi.localIP();
-}
-
-uint32_t Knx::currentSubnetMask() {
-    return WiFi.subnetMask();
-}
-
-uint32_t Knx::currentDefaultGateway() {
-    return WiFi.gatewayIP();
-}
-
-void Knx::macAddress(uint8_t * addr) {
-    esp_wifi_get_mac(WIFI_IF_STA, addr);
-}
-
-uint32_t Knx::uniqueSerialNumber() {
-    uint64_t chipid  = ESP.getEfuseMac();
-    uint32_t upperId = (chipid >> 32) & 0xFFFFFFFF;
-    uint32_t lowerId = (chipid & 0xFFFFFFFF);
-    return (upperId ^ lowerId);
-}
-
-void Knx::restart() {
-    ESP.restart();
-}
 
 void Knx::setupMultiCast(uint32_t addr, uint16_t port) {
     IPAddress mcastaddr(htonl(addr));
@@ -198,7 +171,7 @@ bool Knx::sendBytesUniCast(uint32_t addr, uint16_t port, uint8_t * buffer, uint1
     return true;
 }
 
-
+/*
 uint8_t * Knx::getEepromBuffer(size_t size) {
     if (eepromBuf_ != nullptr) {
         delete[] eepromBuf_;
@@ -212,6 +185,6 @@ uint8_t * Knx::getEepromBuffer(size_t size) {
 void Knx::commitToEeprom() {
     EMSESP::nvs_.putBytes("knx", eepromBuf_, eepromSize_);
 }
-
+*/
 
 } // namespace emsesp

@@ -37,6 +37,9 @@ public:
     void commitToEeprom();
 private:
     WiFiUDP _udp;
+
+    uint8_t * eepromBuf_  = nullptr;
+    size_t    eepromSize_ = 0;
 };
 
 #endif

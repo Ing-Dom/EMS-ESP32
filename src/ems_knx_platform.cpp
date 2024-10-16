@@ -1,7 +1,7 @@
 #include "ems_knx_platform.h"
 
 #include <Arduino.h>
-#include <EEPROM.h>
+#include "emsesp.h"
 
 #include "knx/bits.h"
 
@@ -102,18 +102,16 @@ bool EMSEsp32Platform::sendBytesUniCast(uint32_t addr, uint16_t port, uint8_t* b
     return true;
 }
 
-uint8_t * EMSEsp32Platform::getEepromBuffer(uint32_t size)
-{
-    uint8_t * eepromptr = EEPROM.getDataPtr();
-    if(eepromptr == nullptr) {
-        EEPROM.begin(size);
-        eepromptr = EEPROM.getDataPtr();
+uint8_t * EMSEsp32Platform::getEepromBuffer(size_t size) {
+    if (eepromBuf_ != nullptr) {
+        delete[] eepromBuf_;
     }
-    return eepromptr;
+    eepromBuf_  = new uint8_t[size];
+    eepromSize_ = size;
+    emsesp::EMSESP::nvs_.getBytes("knx", eepromBuf_, size);
+    return eepromBuf_;
 }
 
-void EMSEsp32Platform::commitToEeprom()
-{
-    EEPROM.getDataPtr(); // trigger dirty flag in EEPROM lib to make sure data will be written to flash
-    EEPROM.commit();
+void EMSEsp32Platform::commitToEeprom() {
+    emsesp::EMSESP::nvs_.putBytes("knx", eepromBuf_, eepromSize_);
 }
