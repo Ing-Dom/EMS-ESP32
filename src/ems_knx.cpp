@@ -17,8 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "knx.h"
+#include "ems_knx.h"
 #include "emsesp.h"
+#include <knx.h>
+#include <ems_knx_platform.h>
+
+EMSEsp32Platform knxPlatform(&Serial2);
+Bau57B0 knxBau(knxPlatform);
+KnxFacade<EMSEsp32Platform, Bau57B0> knx(knxBau);
 
 namespace emsesp {
 
@@ -58,6 +64,8 @@ void Knx::knx_loop_task(void * pvParameters) {
 */
 void Knx::loop() {
     // do loop
+    knx.loop();
+    
 }
 
 /*

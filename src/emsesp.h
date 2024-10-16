@@ -57,7 +57,7 @@
 #include "telegram.h"
 #include "mqtt.h"
 #include "modbus.h"
-#include "Knx.h"
+#include "ems_knx.h"
 #include "system.h"
 #include "temperaturesensor.h"
 #include "analogsensor.h"
