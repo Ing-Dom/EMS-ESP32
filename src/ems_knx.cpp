@@ -20,13 +20,16 @@
 #include "ems_knx.h"
 #include "emsesp.h"
 #include <knx.h>
+
 #include <ems_knx_platform.h>
 
-EMSEsp32Platform knxPlatform();
+EMSEsp32Platform knxPlatform;
 Bau57B0 knxBau(knxPlatform);
 KnxFacade<EMSEsp32Platform, Bau57B0> knx(knxBau);
 
+
 namespace emsesp {
+
 
 uuid::log::Logger Knx::logger_{"KNX", uuid::log::Facility::DAEMON};
 

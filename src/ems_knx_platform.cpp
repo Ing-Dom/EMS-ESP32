@@ -7,7 +7,7 @@
 
 
 
-EMSEsp32Platform::EMSEsp32Platform()
+EMSEsp32Platform::EMSEsp32Platform() : ArduinoPlatform()
 {
 }
 
