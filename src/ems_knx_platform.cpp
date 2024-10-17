@@ -11,10 +11,6 @@ EMSEsp32Platform::EMSEsp32Platform() : ArduinoPlatform()
 {
 }
 
-EMSEsp32Platform::EMSEsp32Platform(HardwareSerial* s) : ArduinoPlatform(s)
-{
-}
-
 uint32_t EMSEsp32Platform::currentIpAddress()
 {
     return WiFi.localIP();
@@ -52,53 +48,52 @@ void EMSEsp32Platform::restart()
 void EMSEsp32Platform::setupMultiCast(uint32_t addr, uint16_t port)
 {
     IPAddress mcastaddr(htonl(addr));
-    
-    KNX_DEBUG_SERIAL.printf("setup multicast addr: %s port: %d ip: %s\n", mcastaddr.toString().c_str(), port,
-        WiFi.localIP().toString().c_str());
-    uint8_t result = _udp.beginMulticast(mcastaddr, port);
-    KNX_DEBUG_SERIAL.printf("result %d\n", result);
+    _udp = new WiFiUDP;
+    LOG_DEBUG("setup multicast addr: %s port: %d ip: %s\n", mcastaddr.toString().c_str(), port, WiFi.localIP().toString().c_str());
+    uint8_t result = _udp->beginMulticast(mcastaddr, port);
+    LOG_DEBUG("result %d\n", result);
 }
 
 void EMSEsp32Platform::closeMultiCast()
 {
-    _udp.stop();
+    _udp->stop();
 }
 
 bool EMSEsp32Platform::sendBytesMultiCast(uint8_t * buffer, uint16_t len)
 {
-    //printHex("<- ",buffer, len);
-    _udp.beginMulticastPacket();
-    _udp.write(buffer, len);
-    _udp.endPacket();
+    _udp->beginMulticastPacket();
+    _udp->write(buffer, len);
+    _udp->endPacket();
     return true;
 }
 
 int EMSEsp32Platform::readBytesMultiCast(uint8_t * buffer, uint16_t maxLen)
 {
-    int len = _udp.parsePacket();
+    int len = _udp->parsePacket();
     if (len == 0)
         return 0;
-    
-    if (len > maxLen)
-    {
-        KNX_DEBUG_SERIAL.printf("udp buffer to small. was %d, needed %d\n", maxLen, len);
-        fatalError();
+
+    if (len > maxLen) {
+        LOG_DEBUG("udp buffer to small. was %d, needed %d\n", maxLen, len);
+        return 0;
     }
 
-    _udp.read(buffer, len);
-    //printHex("-> ", buffer, len);
+    _udp->read(buffer, len);
     return len;
 }
 
 bool EMSEsp32Platform::sendBytesUniCast(uint32_t addr, uint16_t port, uint8_t* buffer, uint16_t len)
 {
     IPAddress ucastaddr(htonl(addr));
-    println("sendBytesUniCast endPacket fail");
-    if(_udp.beginPacket(ucastaddr, port) == 1) {
-        _udp.write(buffer, len);
-        if(_udp.endPacket() == 0) println("sendBytesUniCast endPacket fail");
+    LOG_DEBUG("sendBytesUniCast endPacket fail");
+    if (_udp->beginPacket(ucastaddr, port) == 1) {
+        _udp->write(buffer, len);
+        if (_udp->endPacket() == 0) {
+            LOG_DEBUG("sendBytesUniCast endPacket fail");
+        }
+    } else {
+        LOG_DEBUG("sendBytesUniCast beginPacket fail");
     }
-    else println("sendBytesUniCast beginPacket fail");
     return true;
 }
 

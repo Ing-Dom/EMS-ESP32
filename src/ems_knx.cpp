@@ -17,6 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+KNX Integration
+- Remove the KNX Settings regarding Multicast IP from EMS
+- Add a webpage for KNX with at least the possibility to enter prog mode and see prog mode status
+
+
+*/
+
 #include "ems_knx.h"
 #include "emsesp.h"
 #include <knx.h>
@@ -36,15 +44,24 @@ uuid::log::Logger Knx::logger_{"KNX", uuid::log::Facility::DAEMON};
 /*
 * start knx, create a multicast and unicast udp server, listen to packets
 */
-bool Knx::start(const char * multicastaddress, uint16_t multiCastPort) {
-    IPAddress multiCastAddress;
-    multiCastAddress.fromString(multicastaddress);
-    _udp = new WiFiUDP;
-    if (_udp == nullptr) {
-        LOG_ERROR("KNX failed");
-        return false;
-    }
-    _udp->beginMulticast(multiCastAddress, multiCastPort);
+bool Knx::start() {
+    //_udp = new WiFiUDP;
+    //if (_udp == nullptr) {
+    //    LOG_ERROR("KNX failed");
+    //    return false;
+    //}
+
+    knx.readMemory();   // load the stored knx configuration (from ETS) 
+
+    GroupObject::classCallback([](GroupObject& iKo) -> void {
+    //... do something with the group objects
+    // iKo.asap() is the group object's number
+    // iKo.value() is the group object's value
+    });
+
+    knx.start();
+
+
     xTaskCreatePinnedToCore(knx_loop_task, "knxlooptask", 4096, NULL, 2, NULL, portNUM_PROCESSORS - 1);
     LOG_INFO("KNX started");
     return true;
@@ -68,6 +85,10 @@ void Knx::knx_loop_task(void * pvParameters) {
 void Knx::loop() {
     // do loop
     knx.loop();
+
+    if (!knx.configured())
+        return;
+    knx.getGroupObject(1).value(1, Dpt(1,0)); // just send a 1 for debug purpose to group object 1
 }
 
 /*
@@ -124,70 +145,5 @@ bool Knx::setValue(const char * device, const char * tag, const char * name, con
     }
     return true;
 }
-
-
-void Knx::setupMultiCast(uint32_t addr, uint16_t port) {
-    IPAddress mcastaddr(htonl(addr));
-
-    LOG_DEBUG("setup multicast addr: %s port: %d ip: %s\n", mcastaddr.toString().c_str(), port, WiFi.localIP().toString().c_str());
-    uint8_t result = _udp->beginMulticast(mcastaddr, port);
-    LOG_DEBUG("result %d\n", result);
-}
-
-void Knx::closeMultiCast() {
-    _udp->stop();
-}
-
-bool Knx::sendBytesMultiCast(uint8_t * buffer, uint16_t len) {
-    //printHex("<- ",buffer, len);
-    _udp->beginMulticastPacket();
-    _udp->write(buffer, len);
-    _udp->endPacket();
-    return true;
-}
-
-int Knx::readBytesMultiCast(uint8_t * buffer, uint16_t maxLen) {
-    int len = _udp->parsePacket();
-    if (len == 0)
-        return 0;
-
-    if (len > maxLen) {
-        LOG_DEBUG("udp buffer to small. was %d, needed %d\n", maxLen, len);
-        return 0; // fatalError();
-    }
-
-    _udp->read(buffer, len);
-    return len;
-}
-
-bool Knx::sendBytesUniCast(uint32_t addr, uint16_t port, uint8_t * buffer, uint16_t len) {
-    IPAddress ucastaddr(htonl(addr));
-    LOG_DEBUG("sendBytesUniCast endPacket fail");
-    if (_udp->beginPacket(ucastaddr, port) == 1) {
-        _udp->write(buffer, len);
-        if (_udp->endPacket() == 0) {
-            LOG_DEBUG("sendBytesUniCast endPacket fail");
-        }
-    } else {
-        LOG_DEBUG("sendBytesUniCast beginPacket fail");
-    }
-    return true;
-}
-
-/*
-uint8_t * Knx::getEepromBuffer(size_t size) {
-    if (eepromBuf_ != nullptr) {
-        delete[] eepromBuf_;
-    }
-    eepromBuf_  = new uint8_t[size];
-    eepromSize_ = size;
-    EMSESP::nvs_.getBytes("knx", eepromBuf_, size);
-    return eepromBuf_;
-}
-
-void Knx::commitToEeprom() {
-    EMSESP::nvs_.putBytes("knx", eepromBuf_, eepromSize_);
-}
-*/
 
 } // namespace emsesp

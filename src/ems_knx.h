@@ -28,27 +28,9 @@ namespace emsesp {
 
 class Knx {
   public:
-    bool start(const char * multiCastAddress, uint16_t multiCastPort);
+    bool start();
     bool onChange(const char * device, const char * tag, const char * name, const char * value);
 
-
-    // basic stuff
-    void restart();
-
-    //multicast
-    void setupMultiCast(uint32_t addr, uint16_t port);
-    void closeMultiCast();
-    bool sendBytesMultiCast(uint8_t * buffer, uint16_t len);
-    int  readBytesMultiCast(uint8_t * buffer, uint16_t maxLen);
-
-    //unicast
-    bool sendBytesUniCast(uint32_t addr, uint16_t port, uint8_t * buffer, uint16_t len);
-
-/*
-    //memory
-    uint8_t * getEepromBuffer(uint32_t size);
-    void      commitToEeprom();
-*/
 
   private:
     WiFiUDP * _udp = nullptr;
@@ -61,9 +43,6 @@ class Knx {
 
     bool getValue(const char * device, const char * tag, const char * name, char * value, size_t len);
     bool setValue(const char * device, const char * tag, const char * name, const char * value);
-
-    uint8_t * eepromBuf_  = nullptr;
-    size_t    eepromSize_ = 0;
 };
 
 } // namespace emsesp

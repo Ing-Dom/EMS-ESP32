@@ -8,7 +8,6 @@ class EMSEsp32Platform : public ArduinoPlatform
 {
 public:
     EMSEsp32Platform();
-    EMSEsp32Platform(HardwareSerial* s);
 
 
     // ip stuff
@@ -36,7 +35,7 @@ public:
     uint8_t* getEepromBuffer(uint32_t size);
     void commitToEeprom();
 private:
-    WiFiUDP _udp;
+    WiFiUDP * _udp = nullptr;
 
     uint8_t * eepromBuf_  = nullptr;
     size_t    eepromSize_ = 0;

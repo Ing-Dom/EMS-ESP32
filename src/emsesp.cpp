@@ -1646,7 +1646,7 @@ void EMSESP::start() {
     if (system_.knx_enabled()) {
         LOG_INFO("Starting KNX");
         knx_ = new Knx;
-        knx_->start(system_.knx_multicast_ip().c_str(), system_.knx_multicast_port());
+        knx_->start();
     }
 
     mqtt_.start();              // mqtt init
