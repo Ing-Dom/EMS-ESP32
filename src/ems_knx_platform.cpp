@@ -4,6 +4,9 @@
 #include "emsesp.h"
 
 #include "knx/bits.h"
+#include <ETH.h>
+
+#define KNX_NETIF ETH
 
 
 
@@ -13,17 +16,17 @@ EMSEsp32Platform::EMSEsp32Platform() : ArduinoPlatform()
 
 uint32_t EMSEsp32Platform::currentIpAddress()
 {
-    return WiFi.localIP();
+    return KNX_NETIF.localIP();
 }
 
 uint32_t EMSEsp32Platform::currentSubnetMask()
 {
-    return WiFi.subnetMask();
+    return KNX_NETIF.subnetMask();
 }
 
 uint32_t EMSEsp32Platform::currentDefaultGateway()
 {
-    return WiFi.gatewayIP();
+    return KNX_NETIF.gatewayIP();
 }
 
 void EMSEsp32Platform::macAddress(uint8_t * addr)
@@ -49,9 +52,13 @@ void EMSEsp32Platform::setupMultiCast(uint32_t addr, uint16_t port)
 {
     IPAddress mcastaddr(htonl(addr));
     _udp = new WiFiUDP;
-    LOG_DEBUG("setup multicast addr: %s port: %d ip: %s\n", mcastaddr.toString().c_str(), port, WiFi.localIP().toString().c_str());
-    uint8_t result = _udp->beginMulticast(mcastaddr, port);
+    LOG_DEBUG("setup multicast addr: %s port: %d ip: %s\n", mcastaddr.toString().c_str(), port, KNX_NETIF.localIP().toString().c_str());
+    KNX_DEBUG_SERIAL.printf("setup multicast addr: %s port: %d ip: %s\n", mcastaddr.toString().c_str(), port,
+        KNX_NETIF.localIP().toString().c_str());
+    //uint8_t result = _udp->begin(port); 
+    uint8_t result = _udp->beginMulticast(IPAddress(224,0,23,12), 3671); //beginMulticast(mcastaddr, port);
     LOG_DEBUG("result %d\n", result);
+    KNX_DEBUG_SERIAL.printf("result %d\n", result);
 }
 
 void EMSEsp32Platform::closeMultiCast()
@@ -69,12 +76,16 @@ bool EMSEsp32Platform::sendBytesMultiCast(uint8_t * buffer, uint16_t len)
 
 int EMSEsp32Platform::readBytesMultiCast(uint8_t * buffer, uint16_t maxLen)
 {
+    
     int len = _udp->parsePacket();
     if (len == 0)
         return 0;
 
+    KNX_DEBUG_SERIAL.println("readBytesMultiCast");
+
     if (len > maxLen) {
         LOG_DEBUG("udp buffer to small. was %d, needed %d\n", maxLen, len);
+        KNX_DEBUG_SERIAL.printf("udp buffer to small. was %d, needed %d\n", maxLen, len);
         return 0;
     }
 
@@ -85,7 +96,8 @@ int EMSEsp32Platform::readBytesMultiCast(uint8_t * buffer, uint16_t maxLen)
 bool EMSEsp32Platform::sendBytesUniCast(uint32_t addr, uint16_t port, uint8_t* buffer, uint16_t len)
 {
     IPAddress ucastaddr(htonl(addr));
-    LOG_DEBUG("sendBytesUniCast endPacket fail");
+
+    println("sendBytesUniCast ");
     if (_udp->beginPacket(ucastaddr, port) == 1) {
         _udp->write(buffer, len);
         if (_udp->endPacket() == 0) {

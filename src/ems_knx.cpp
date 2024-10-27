@@ -50,7 +50,7 @@ bool Knx::start() {
     //    LOG_ERROR("KNX failed");
     //    return false;
     //}
-
+    delay(10000);
     knx.readMemory();   // load the stored knx configuration (from ETS) 
 
     GroupObject::classCallback([](GroupObject& iKo) -> void {
@@ -85,10 +85,11 @@ void Knx::knx_loop_task(void * pvParameters) {
 void Knx::loop() {
     // do loop
     knx.loop();
-
+    //KNX_DEBUG_SERIAL.println("KNXLOOP");
     if (!knx.configured())
         return;
     knx.getGroupObject(1).value(1, Dpt(1,0)); // just send a 1 for debug purpose to group object 1
+
 }
 
 /*
