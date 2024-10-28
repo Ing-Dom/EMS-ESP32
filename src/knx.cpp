@@ -28,6 +28,7 @@ uuid::log::Logger Knx::logger_{"KNX", uuid::log::Facility::DAEMON};
 * start knx, create a multicast and unicast udp server, listen to packets
 */
 bool Knx::start(const char * multicastaddress, uint16_t multiCastPort) {
+    /*
     IPAddress multiCastAddress;
     multiCastAddress.fromString(multicastaddress);
     _udp = new WiFiUDP;
@@ -36,6 +37,7 @@ bool Knx::start(const char * multicastaddress, uint16_t multiCastPort) {
         return false;
     }
     _udp->beginMulticast(multiCastAddress, multiCastPort);
+    */
     xTaskCreatePinnedToCore(knx_loop_task, "knxlooptask", 4096, NULL, 2, NULL, portNUM_PROCESSORS - 1);
     LOG_INFO("KNX started");
     return true;
@@ -114,6 +116,7 @@ bool Knx::setValue(const char * device, const char * tag, const char * name, con
     }
     return true;
 }
+/*
 
 uint32_t Knx::currentIpAddress() {
     return WiFi.localIP();
@@ -191,6 +194,7 @@ bool Knx::sendBytesUniCast(uint32_t addr, uint16_t port, uint8_t * buffer, uint1
 }
 
 
+
 uint8_t * Knx::getEepromBuffer(size_t size) {
     if (eepromBuf_ != nullptr) {
         delete[] eepromBuf_;
@@ -204,6 +208,6 @@ uint8_t * Knx::getEepromBuffer(size_t size) {
 void Knx::commitToEeprom() {
     EMSESP::nvs_.putBytes("knx", eepromBuf_, eepromSize_);
 }
-
+*/
 
 } // namespace emsesp

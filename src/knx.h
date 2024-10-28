@@ -31,6 +31,7 @@ class Knx {
     bool start(const char * multiCastAddress, uint16_t multiCastPort);
     bool onChange(const char * device, const char * tag, const char * name, const char * value);
     // ip stuff
+    /*
     uint32_t currentIpAddress();
     uint32_t currentSubnetMask();
     uint32_t currentDefaultGateway();
@@ -54,9 +55,10 @@ class Knx {
     //memory
     uint8_t * getEepromBuffer(uint32_t size);
     void      commitToEeprom();
+    */
 
   private:
-    WiFiUDP * _udp = nullptr;
+    //WiFiUDP * _udp = nullptr;
 
     static const uint32_t    LOOP_TIME = 5; // 5 ms
     static uuid::log::Logger logger_;
@@ -67,8 +69,8 @@ class Knx {
     bool getValue(const char * device, const char * tag, const char * name, char * value, size_t len);
     bool setValue(const char * device, const char * tag, const char * name, const char * value);
 
-    uint8_t * eepromBuf_  = nullptr;
-    size_t    eepromSize_ = 0;
+    //uint8_t * eepromBuf_  = nullptr;
+    //size_t    eepromSize_ = 0;
 };
 
 } // namespace emsesp
