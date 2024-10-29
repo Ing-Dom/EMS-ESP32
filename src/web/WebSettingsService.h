@@ -74,8 +74,8 @@ class WebSettings {
     uint8_t  modbus_max_clients;
     uint32_t modbus_timeout;
     bool     knx_enabled;
-    uint16_t knx_multicast_port;
-    String   knx_multicast_ip;
+    //uint16_t knx_multicast_port;
+    //String   knx_multicast_ip;
 
     uint8_t phy_type;
     int8_t  eth_power; // -1 means disabled

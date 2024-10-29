@@ -43,8 +43,6 @@ export interface Settings {
   modbus_max_clients: number;
   modbus_timeout: number;
   knx_enabled: boolean;
-  knx_mc_ip: string;
-  knx_mc_port: number;
 }
 
 export enum busConnectionStatus {

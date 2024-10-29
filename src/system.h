@@ -161,12 +161,12 @@ class System {
     bool knx_enabled() {
         return knx_enabled_;
     }
-    uint16_t knx_multicast_port() {
-        return knx_multicast_port_;
-    }
-    String knx_multicast_ip() {
-        return knx_multicast_ip_;
-    }
+    //uint16_t knx_multicast_port() {
+    //    return knx_multicast_port_;
+    //}
+    //String knx_multicast_ip() {
+    //    return knx_multicast_ip_;
+    //}
 
     bool analog_enabled() {
         return analog_enabled_;
@@ -409,8 +409,8 @@ class System {
     uint8_t     modbus_max_clients_;
     uint32_t    modbus_timeout_;
     bool        knx_enabled_;
-    uint16_t    knx_multicast_port_;
-    String      knx_multicast_ip_;
+    //uint16_t    knx_multicast_port_;
+    //String      knx_multicast_ip_;
 
     // ethernet
     uint8_t phy_type_;
