@@ -1643,11 +1643,7 @@ void EMSESP::start() {
         modbus_ = new Modbus;
         modbus_->start(1, system_.modbus_port(), system_.modbus_max_clients(), system_.modbus_timeout());
     }
-    if (system_.knx_enabled()) {
-        LOG_INFO("Starting KNX");
-        knx_ = new Knx;
-        knx_->start();
-    }
+
 
     mqtt_.start();              // mqtt init
     system_.start();            // starts commands, led, adc, button, network (sets hostname), syslog & uart
@@ -1655,11 +1651,18 @@ void EMSESP::start() {
     temperaturesensor_.start(); // Temperature external sensors
     analogsensor_.start();      // Analog external sensors
 
+
     // start web services
     webLogService.start();     // apply settings to weblog service
     webModulesService.begin(); // setup the external library modules
     webServer.begin();         // start the web server
     LOG_INFO("Starting Web Server");
+
+    if (system_.knx_enabled()) {
+        LOG_INFO("Starting KNX");
+        knx_ = new Knx;
+        knx_->start();
+    }
 }
 
 // main loop calling all services
